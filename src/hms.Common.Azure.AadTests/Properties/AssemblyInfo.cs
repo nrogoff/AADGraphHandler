@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HMS AAD Graph Handler")]
-[assembly: AssemblyDescription("Wrapper for the Azure Active Directory Graph SDK Client")]
+[assembly: AssemblyTitle("hms.common.azure.aadTests")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hard Medium Soft Ltd.")]
-[assembly: AssemblyProduct("hms.Common.Azure.AADGraphHandler")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("hms.common.azure.aadTests")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6106f608-8c00-474c-8cbb-df577d9cfd9f")]
+[assembly: Guid("4ce23021-2d7c-402c-9aed-e0c3899f7a7e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

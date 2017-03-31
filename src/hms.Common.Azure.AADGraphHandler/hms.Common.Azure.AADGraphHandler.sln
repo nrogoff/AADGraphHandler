@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hms.Common.Azure.AADGraphHandler", "hms.Common.Azure.AADGraphHandler\hms.Common.Azure.AADGraphHandler.csproj", "{6106F608-8C00-474C-8CBB-DF577D9CFD9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hms.common.azure.aadTests", "..\hms.Common.Azure.AadTests\hms.common.azure.aadTests.csproj", "{4CE23021-2D7C-402C-9AED-E0C3899F7A7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6106F608-8C00-474C-8CBB-DF577D9CFD9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6106F608-8C00-474C-8CBB-DF577D9CFD9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6106F608-8C00-474C-8CBB-DF577D9CFD9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CE23021-2D7C-402C-9AED-E0C3899F7A7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CE23021-2D7C-402C-9AED-E0C3899F7A7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CE23021-2D7C-402C-9AED-E0C3899F7A7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CE23021-2D7C-402C-9AED-E0C3899F7A7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

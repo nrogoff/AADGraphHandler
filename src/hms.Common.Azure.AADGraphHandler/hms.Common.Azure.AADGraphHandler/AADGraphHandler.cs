@@ -115,7 +115,6 @@ namespace hms.Common.Azure.AADGraphHandler
         {
             if (TokenForUser == null)
             {
-
                 AuthenticationContext authenticationContext = new AuthenticationContext(_userConfig.TenantAuthorityServiceUri.AbsoluteUri, false);
                 AuthenticationResult userAuthnResult;
                 if (!string.IsNullOrEmpty(_userConfig.Username))
@@ -135,11 +134,7 @@ namespace hms.Common.Azure.AADGraphHandler
                         _userConfig.RedirectUri,
                         new PlatformParameters(PromptBehavior.RefreshSession));
                 }
-
-
                 TokenForUser = userAuthnResult.AccessToken;
-                Console.WriteLine("\n Welcome " + userAuthnResult.UserInfo.GivenName + " " +
-                                  userAuthnResult.UserInfo.FamilyName);
             }
             return TokenForUser;
         }
