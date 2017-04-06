@@ -208,13 +208,17 @@ namespace hms.Common.Azure.AADGraphHandler
         /// Get the AAD User by Object Id
         /// </summary>
         /// <param name="aadObjectId">AAD User Object Id (nameidentifier claim)</param>
-        Task<IUser> GetUserAsync(string aadObjectId);
+        /// <param name="bypassCacheProvider">Force operation to not use the cache provider. Default is False</param>
+        /// <remarks>Will use Cache Provider if implemented</remarks>
+        Task<IUser> GetUserAsync(string aadObjectId, bool bypassCacheProvider = false);
 
         /// <summary>
         /// Get the AAD User by Object Id
         /// </summary>
         /// <param name="aadObjectId">AAD User Object Id (nameidentifier claim)</param>
-        IUser GetUser(string aadObjectId);
+        /// <param name="bypassCacheProvider">Force operation to not use the cache provider. Default is False</param>
+        /// <remarks>Will use Cache Provider if implemented</remarks>
+        IUser GetUser(string aadObjectId, bool bypassCacheProvider = false);
 
         /// <summary>
         /// Finds users based on a search string.
@@ -354,9 +358,10 @@ namespace hms.Common.Azure.AADGraphHandler
         /// <summary>
         /// Returns a random string of upto 32 characters.
         /// </summary>
-        /// <param name="length">A value from 1 to 32. If a number larger than 32, then 32 is used.</param>
+        /// <param name="length">A value from 3 to 32. If a number larger than 32, then 32 is used.</param>
+        /// <param name="ensureComplexity">Ensure string has at least one lowercase, one uppcase character and at least one number. Default = true</param>
         /// <returns>String of upto 32 characters.</returns>
-        string GetRandomString(int length = 32);
+        string GetPasswordString(int length = 32, bool ensureComplexity = true);
 
         #endregion
 

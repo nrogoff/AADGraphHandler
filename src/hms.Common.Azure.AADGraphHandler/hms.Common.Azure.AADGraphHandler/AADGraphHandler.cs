@@ -8,13 +8,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.ActiveDirectory.GraphClient;
 using Microsoft.Azure.ActiveDirectory.GraphClient.Extensions;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Group = Microsoft.Azure.ActiveDirectory.GraphClient.Group;
 
 namespace hms.Common.Azure.AADGraphHandler
 {
@@ -198,9 +201,9 @@ namespace hms.Common.Azure.AADGraphHandler
                 throw new ArgumentException("The Delete User operation requires the Active Directory Client to be as a User context. Please use the User config constructor.");
             }
 
-            var signedInUser = (User)await AADClient.Me.ExecuteAsync();
+            var signedInUser = await AADClient.Me.ExecuteAsync();
 
-            return signedInUser;
+            return (User)signedInUser;
         }
 
         /// <summary>
@@ -222,16 +225,8 @@ namespace hms.Common.Azure.AADGraphHandler
         /// must be a privileged user (like a company or user admin)</remarks>
         public async Task<bool> CreateNewUserAsync(User newUser)
         {
-            try
-            {
-                await _aadClient.Users.AddUserAsync(newUser);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
+            await _aadClient.Users.AddUserAsync(newUser);
+            return true;
         }
 
         /// <summary>
@@ -247,17 +242,32 @@ namespace hms.Common.Azure.AADGraphHandler
         }
 
         /// <summary>
-        /// Update a user
+        /// Update a user.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        /// <remarks>Will update the cache provider if implemented</remarks>
+        /// <exception cref="">If user account does not exist</exception>
+        /// <remarks>Will update the cache provider if implemented.</remarks>
         public async Task UpdateUserAsync(IUser user)
         {
-            await user.UpdateAsync();
-
             string cacheKey = $"{CachePrefix}:User:{user.ObjectId}";
-            _cacheProvider?.Add(cacheKey, user);
+            try
+            {
+                // Check if user still exists as no error is thrown by the update.
+                await GetUserAsync(user.ObjectId, true); //bypass local cache
+                await user.UpdateAsync();
+                _cacheProvider?.Add(cacheKey, user);
+            }
+            catch (AggregateException aggregateException)
+            {
+                if (aggregateException.InnerExceptions.Any(e => e.Message.Contains("does not exist")))
+                {
+                    //remove from cache if exists
+                    _cacheProvider?.Remove(cacheKey);
+                    throw;
+                }
+            }
+
         }
 
         /// <summary>
@@ -283,7 +293,7 @@ namespace hms.Common.Azure.AADGraphHandler
 
             PasswordProfile passwordProfile = new PasswordProfile
             {
-                Password = GetRandomString(16),
+                Password = GetPasswordString(16),
                 ForceChangePasswordNextLogin = true
             };
             user.PasswordProfile = passwordProfile;
@@ -449,15 +459,16 @@ namespace hms.Common.Azure.AADGraphHandler
         /// Get the AAD User by Object Id
         /// </summary>
         /// <param name="aadObjectId">AAD User Object Id (nameidentifier claim)</param>
+        /// <param name="bypassCacheProvider">Force operation to not use the cache provider. Default is False</param>
         /// <remarks>Will use Cache Provider if implemented</remarks>
-        public async Task<IUser> GetUserAsync(string aadObjectId)
+        public async Task<IUser> GetUserAsync(string aadObjectId, bool bypassCacheProvider = false)
         {
             IUserCollection userCollection = AADClient.Users;
 
             IUser user;
             string cacheKey = $"{CachePrefix}:User:{aadObjectId}";
 
-            if (_cacheProvider != null && _cacheProvider.Exist(cacheKey))
+            if (_cacheProvider != null && !bypassCacheProvider && _cacheProvider.Exist(cacheKey))
             {
                 user = _cacheProvider.Get<IUser>(cacheKey);
             }
@@ -476,9 +487,11 @@ namespace hms.Common.Azure.AADGraphHandler
         /// Get the AAD User by Object Id
         /// </summary>
         /// <param name="aadObjectId">AAD User Object Id (nameidentifier claim)</param>
-        public IUser GetUser(string aadObjectId)
+        /// <param name="bypassCacheProvider">Force operation to not use the cache provider. Default is False</param>
+        /// <remarks>Will use Cache Provider if implemented</remarks>
+        public IUser GetUser(string aadObjectId, bool bypassCacheProvider = false)
         {
-            var user = GetUserAsync(aadObjectId).Result;
+            var user = GetUserAsync(aadObjectId, bypassCacheProvider).Result;
             return user;
         }
 
@@ -749,13 +762,50 @@ namespace hms.Common.Azure.AADGraphHandler
         /// <summary>
         /// Returns a random string of upto 32 characters.
         /// </summary>
-        /// <param name="length">A value from 1 to 32. If a number larger than 32, then 32 is used.</param>
+        /// <param name="length">A value from 6 to 32. If a number larger than 32, then 32 is used.</param>
+        /// <param name="ensureComplexity">Ensure string has at least one lowercase, one uppcase character and at least one number. Default = true</param>
         /// <returns>String of upto 32 characters.</returns>
-        public string GetRandomString(int length = 32)
+        public string GetPasswordString(int length = 32, bool ensureComplexity = true)
         {
-            if (length <= 0) throw new ArgumentOutOfRangeException(nameof(length));
+            if (length < 6) throw new ArgumentOutOfRangeException(nameof(length));
+            length = length > 32 ? 32 : length;
+
             //because GUID can't be longer than 32
-            return Guid.NewGuid().ToString("N").Substring(0, length > 32 ? 32 : length);
+
+            const string valid = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder newPasswordBuilder = new StringBuilder();
+            Random rnd = new Random();
+
+
+            string newPassword;
+            bool complexityMet;
+            int stringLength;
+            int loopCount = 0; //safety exit
+            do
+            {
+                loopCount++;
+                stringLength = length;
+                //randomString = Guid.NewGuid().ToString("N").Substring(0, length > 32 ? 32 : length);
+                
+                while (0 < stringLength--)
+                {
+                    newPasswordBuilder.Append(valid[rnd.Next(valid.Length)]);
+                }
+                newPassword = newPasswordBuilder.ToString();
+                if (ensureComplexity)
+                {
+                    complexityMet = Regex.IsMatch(newPassword, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,32}$");
+                }
+                else
+                {
+                    complexityMet = true;
+                }
+                
+                Debug.WriteLine(newPassword);
+                newPasswordBuilder.Clear();
+            } while (!complexityMet && loopCount < 50);
+
+            return newPassword;
         }
 
         #endregion
