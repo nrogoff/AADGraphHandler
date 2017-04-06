@@ -1,4 +1,4 @@
-# AADGraphHandler
+ # AADGraphHandler
 Azure Active Directory Graph Client Handler or Wrapper. This is a simple wrapper to make using the SDK easier.
 
 ## NuGet
@@ -34,21 +34,24 @@ You will need to reference these when instantiating the AADGraphHandler.
 ### 3. Create the AADGraphHandler Configuration object
 There are two different configuration objects. One for use as an application and one for use as a user.
 
+
     var appConfig = new AADGraphHandler.AADGraphHandlerConfigurationForApp
     {
         TenantId = TenantId,
-        GraphServiceRootUri = new Uri(GraphServiceRootUri),
-        AuthorityServiceRootUri = new Uri(AuthorityServiceRootUri),
-        TenantDisplayName = TenantDisplayName,
-        AppClientId = ApiAppClientId,
-        AppClientSecret = ApiAppClientSecret
+        GraphServiceRootUri = new Uri(GraphServiceRootUri),
+        AuthorityServiceRootUri = new Uri(AuthorityServiceRootUri),
+        TenantDisplayName = TenantDisplayName,
+        AppClientId = ApiAppClientId,
+        AppClientSecret = ApiAppClientSecret
     };
     var graphHandlerAsApp = new AADGraphHandler(appConfig);
 
+
 or as a user
 
-    var userConfig = new AADGraphHandler.AADGraphHandlerConfigurationForUser
-    {
+
+    var userConfig = new AADGraphHandler.AADGraphHandlerConfigurationForUser
+    {
         TenantId = TenantId,
         GraphServiceRootUri = new Uri(GraphServiceRootUri),
         AuthorityServiceRootUri = new Uri(AuthorityServiceRootUri),
@@ -56,7 +59,7 @@ or as a user
         RedirectUri = new Uri(RedirectUri),
         AppClientId = NativeAppClientId,
         Username = username
-    };
-    var graphHandlerAsUser = new AADGraphHandler(userConfig);
+    };
+    var graphHandlerAsUser = new AADGraphHandler(userConfig);
 
 
