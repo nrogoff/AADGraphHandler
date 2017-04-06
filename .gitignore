@@ -250,3 +250,5 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+/src/hms.Common.Azure.AadTests/app.ORIG.config
+/src/hms.Common.Azure.AadTests/app.PRIVATE.config
